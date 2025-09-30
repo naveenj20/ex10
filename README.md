@@ -1,64 +1,88 @@
-# Exercise: Sending Email Using UiPath
+# UiPath Email Automation Project
 
 ## Objective
-To automate sending an email using UiPath’s **Send SMTP Mail Message** activity.
+This project demonstrates how to:
+1. Send an Email using UiPath’s **Send SMTP Mail Message** activity.  
+2. Download Email Attachments (e.g., resumes) using **Get IMAP/Outlook Mail Messages**.
 
 ---
 
-## Step-by-Step Instructions
+## Part 1: Sending Email
 
-### 1. Create New Project
-- Open **UiPath Studio** → New Project → Process  
-- Name the project `SendEmailExample`
+### Steps
+1. Create New Project
+   - Open UiPath Studio → `New Project` → `Process`
+   - Name it **SendEmailExample**
 
-### 2. Add Variables
-- Create the following variables in **Data Manager**:
-  | Name   | Data Type      | Scope | Purpose                        |
-  |--------|----------------|-------|--------------------------------|
-  | pass   | SecureString   | Main  | Stores email account password securely |
-  | result | String         | Main  | Stores the status code of sent email |
+2. Add Variables
+   | Name  | Data Type    | Scope | Purpose                              |
+   |-------|--------------|-------|--------------------------------------|
+   | pass  | SecureString | Main  | Stores email account password        |
+   | result| String       | Main  | Stores the status code of email sent |
 
-### 3. Use Send SMTP Mail Message Activity
-1. Drag **Send SMTP Mail Message** into the workflow.  
-2. Configure the following properties:  
+3. Configure Send SMTP Mail Message
+   - Drag `Send SMTP Mail Message` into the workflow.
+   - Properties:
+     - To: `"recipient@example.com"`
+     - Subject: `"test mail"`
+     - Body: `"Today, 23/09/2025, we're testing email automation"`
+     - Port: `25` (or your SMTP server’s port, often `587` for Gmail)
+     - Server: `"smtp.gmail.com"`
+     - Email: `"your_email@gmail.com"`
+     - SecurePassword: `pass`
+     - StatusCode: `result`
 
-| Property          | Value / Description                                      |
-|------------------|----------------------------------------------------------|
-| **To**           | `"recipient@example.com"`                                 |
-| **Subject**      | `"test mail"`                                             |
-| **Body**         | `"Today, 23/09/2025, we're testing email automation"`    |
-| **Attachments**  | Optional – click **Attach Files** to add attachments    |
-| **Port**         | `25` (or your SMTP server port)                         |
-| **Server**       | `"smtp.gmail.com"`                                       |
-| **Email**        | `"your_email@gmail.com"`                                 |
-| **SecurePassword** | Assign variable `pass` (SecureString)                  |
-| **UseOAuth**     | Checked/Unchecked depending on authentication method    |
-| **StatusCode**   | `result` (to store result of email sending)             |
+4. Add Confirmation
+   - Drag `Message Box` below the SMTP activity.
+   - Text = `"Email sent!"`
 
----
-
-### 4. Add Confirmation Message
-- Drag a **Message Box** activity below **Send SMTP Mail Message**.  
-- Set **Text** = `"Email sent!"` to notify when the email is successfully sent.
+**Output:**  
+- Email sent to the specified recipient.  
+- Message Box confirms success.  
+- `result` stores the SMTP status code.  
 
 ---
 
-## Workflow
-1. Configure SMTP settings and login credentials.  
-2. Compose email with recipient, subject, body, and optional attachments.  
-3. Send email using **Send SMTP Mail Message**.  
-4. Show **Message Box** confirmation.
+## Part 2: Downloading Resume Attachment
+
+### Steps
+1. Add Email Activity
+   - Use `Get IMAP Mail Messages` (or `Get Outlook Mail Messages` if using Outlook).
+   - Configure:
+     - Server: `imap.gmail.com`
+     - Port: `993`
+     - Email: `"your_email@gmail.com"`
+     - Password: `pass` (SecureString)
+     - NumberOfMessages: e.g., `10`
+     - Save output to `mailMessages` (List of MailMessage).
+
+2. Save Attachments
+   - Use `For Each` to iterate over `mailMessages`.
+   - Inside loop:
+     - Add `Save Attachments` activity.
+     - Input: `item.Attachments`
+     - Path: `"C:\Users\admin\Desktop\mail_attachments"` (or any folder).
+     - This will download resumes or any attachments.
 
 ---
 
-## Output
-- Email is sent to the specified recipient.  
-- **Message Box** confirms `"Email sent!"`.  
-- The `result` variable stores the status code returned by the SMTP server.
+## Workflow Summary
+- Send Email → Uses SMTP to deliver a test mail.  
+- Download Resume Attachment → Uses IMAP/Outlook to fetch and save attachments locally.  
 
-<img width="1919" height="1105" alt="Screenshot 2025-09-26 215855" src="https://github.com/user-attachments/assets/5aad31af-1d44-4433-a95c-c2c50a24e1a0" />
-<img width="1917" height="1140" alt="Screenshot 2025-09-26 215907" src="https://github.com/user-attachments/assets/d0ff4159-25ee-4f59-b28e-620dd5d84cc1" />
+---
+
+## Output:
+
+<img width="1515" height="416" alt="Screenshot 2025-09-30 084438" src="https://github.com/user-attachments/assets/e8905442-acd3-4bc7-8b39-e01f955b2aab" />
+<img width="1920" height="1200" alt="Screenshot (175)" src="https://github.com/user-attachments/assets/7dec1f69-5b0f-46ed-8b40-ca8752e5dba6" />
+<img width="816" height="471" alt="Screenshot 2025-09-30 084557" src="https://github.com/user-attachments/assets/03e81a90-c239-438d-bc99-bef701f3ac40" />
+
 
 ## Result
+- Email is successfully sent using SMTP.  
+- Resume (or other attachments) is downloaded and saved in the given folder.  
 
-Thus, email automation was successfully executed using UiPath.
+
+- Make sure your antivirus/firewall allows SMTP/IMAP traffic.  
+- Folder path for saving attachments must exist, otherwise create it first.  
